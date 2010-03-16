@@ -28,6 +28,12 @@ Feature Goals
     - Optional disk bound, commit log style queues, 
   - Equivalents to Orbited for usage from browsers (ideally direct integration 
     with the Google Closure library)
+  - Internal to QMQ, Write most things in a C-style, but do use a few basics from STL:
+      - std::string
+      - std::vector
+      - other basic data structures when needed.
+  - All external facing libraries and APIs will only provide a C interface and 
+    data structure.
 
 Replication Thoughts
 =====

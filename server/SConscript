@@ -16,7 +16,7 @@
 Import("env")
 
 lenv = env.Clone()
-sources = Split("""qmq.c""")
+sources = Split("""qmq.cpp""")
 qmq = lenv.Program("qmq", source=sources)
 
 targets = {'qmq': qmq}

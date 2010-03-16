@@ -21,6 +21,8 @@
 #include <stdlib.h>
 #include <ctype.h>
 
+#include "qmq_server.h"
+
 #include "qmq_version.h"
 
 static void show_version()

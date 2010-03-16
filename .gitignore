@@ -14,3 +14,4 @@ src/ckl
 *.tar.gz
 *.asc
 *.deb
+server/qmq
