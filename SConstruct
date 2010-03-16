@@ -19,25 +19,13 @@ EnsureSConsVersion(1, 1, 0)
 import os
 import re
 from os.path import join as pjoin
-from site_scons import ac
+from site_scons.util import read_version
 
 opts = Variables('build.py')
 
 env = Environment(options=opts,
                   ENV = os.environ.copy(),
-                  tools=['default', 'subst'])
-
-#TODO: convert this to a configure builder, so it gets cached
-def read_version(prefix, path):
-  version_re = re.compile("(.*)%s_VERSION_(?P<id>MAJOR|MINOR|PATCH)(\s+)(?P<num>\d)(.*)" % prefix)
-  versions = {}
-  fp = open(path, 'rb')
-  for line in fp.readlines():
-    m = version_re.match(line)
-    if m:
-      versions[m.group('id')] = int(m.group('num'))
-  fp.close()
-  return (versions['MAJOR'], versions['MINOR'], versions['PATCH'])
+                  tools=['default'])
 
 env['version_major'], env['version_minor'], env['version_patch'] = read_version('QMQ', 'include/qmq_version.h')
 env['version_string'] = "%d.%d.%d"  % (env['version_major'], env['version_minor'], env['version_patch'])
@@ -69,7 +57,7 @@ env = conf.Finish()
 
 Export("env")
 
-qmq = SConscript("src/SConscript")
+qmq = SConscript("server/SConscript")['qmq']
 
 targets = [qmq]
 target_packages = []
