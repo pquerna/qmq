@@ -17,7 +17,6 @@
 EnsureSConsVersion(1, 1, 0)
 
 import os
-import re
 from os.path import join as pjoin
 from site_scons.util import read_version
 
@@ -39,10 +38,8 @@ if os.environ.has_key('CC'):
 if cc:
   conf.env['CC'] = cc
 
-
 if not conf.CheckFunc('floor'):
   conf.env.AppendUnique(LIBS=['m'])
-
 
 #TODO: move to opts
 debug=1
@@ -53,6 +50,8 @@ else:
 
 # this is needed on solaris because of its dumb library path issues
 conf.env.AppendUnique(RPATH = conf.env.get('LIBPATH'))
+conf.env.AppendUnique(CPPPATH=['#include'])
+
 env = conf.Finish()
 
 Export("env")

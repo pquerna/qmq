@@ -1,0 +1,16 @@
+*.o
+.sconf_temp/
+.sconsign.dblite
+config.log
+*.a
+src/ckl
+*~
+*.swp
+._*
+*.obj
+*.lib
+*.pyc
+*.tar.bz2
+*.tar.gz
+*.asc
+*.deb
