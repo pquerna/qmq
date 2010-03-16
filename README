@@ -1,0 +1,70 @@
+Cloudkick QMQ
+=====
+
+Quick Message Queue (QMQ) is a light weight queueing system designed to be 
+robust and quick.  It likely isn't ideal if you want to track financial 
+transactions, but since most Queuing systems were first developed for financial
+systems, and later brought to the wider communities, their priorities are 
+different than QMQ.
+
+
+Feature Goals
+=====
+  - Bounded Queues, so if you have a problem client, kill them, rather than the
+    the whole queue.  When a client subscribes, they describe how they want 
+    the queue to be buffered. (x bytes network buffer or N messages maximum)
+  - Multi-threaded, with clients sticky to a thread. Similar in a concurrency 
+    model to Apache Traffic Server.
+  - Be able to implement AMQP using the primitives provided, but not a short
+    term goal.
+  - Multiple wire formats:
+    - Pure JSON over HTTP
+    - STOMP over WebSockets
+    - STOMP over HTTP/long polling etc.
+    - Avro over HTTP
+    - AMQP
+    - Support for SSL/TLS layers in all protocols.
+  - Multi-node replication and fault tolerance.
+    - Optional disk bound, commit log style queues, 
+  - Equivalents to Orbited for usage from browsers (ideally direct integration 
+    with the Google Closure library)
+
+Replication Thoughts
+=====
+
+The primary goal is for a masterless system, in which the queue can always
+flow.  To accomplish this, each QMQ node treats any of its peers who need data
+as just another client. 
+
+A concrete example:
+  - QMQ A has:
+      Client 1, who publishes messages to "foo".
+      Client 2, who subscribes to "foo"
+  - QMQ B has:
+      Client 3 who publishes messages to "foo"
+      Client 4 who subscribes to "foo"
+  - QMQ C has:
+      Client 5 who subscribes to "foo".
+
+"foo" was created as a fanout queue.
+
+QMQ A will send subscribe messages to B and C.
+QMQ B will send subscribe messages to C and A.
+QMQ C will send subscribe messages to A and B.
+
+When Client 1 Publishes a message to "foo":
+  - QMQ A receives it.
+  - A forwards it on to:
+    - Client 2
+    - B
+    - C
+  - B forwards it to client 4.
+  - C forwards it to client 5.
+
+In the long run, you would want to redesign this to create a hierarchy, but 
+the mesh will work for <8 node clusters, which is all you will ever need (tm).
+
+For early versions, I believe we will just use a hard coded list of peers,
+as doing peer discovery and gossip adds complication.  Ideally in the long
+run, I think we would implement it by having a "system.peers" queue, which
+everyone subscribes to, and peers would periodically send messages to.
